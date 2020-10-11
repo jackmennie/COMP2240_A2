@@ -1,9 +1,10 @@
 package src.problem2;
 
-public class Customer {
+public class Customer implements Runnable {
     private String ID;
     private int arrivalTime;
     private int eatingTime;
+    private Restaurant restaurant;
 
     public Customer(String ID, int arrivalTime, int eatingTime) {
         this.ID = ID;
@@ -22,4 +23,8 @@ public class Customer {
     public String getID() {
         return ID;
     }
+
+	public void enterRestaurant(Restaurant restaurant) {
+        this.restaurant = restaurant;
+	}
 }

@@ -11,6 +11,17 @@ public class Problem2 {
     }
 
     public void run() {
-        System.out.println("Running problem 2")
+        System.out.println("Running problem 2");
+
+        Restaurant restaurant = new Restaurant();
+
+        int time = 0;
+
+        for(Customer customer : customers) {
+            customer.enterRestaurant(restaurant);
+            customer.clock(time);
+            Thread thread = new Thread(customer);
+            thread.start();
+        }
     }
 }
