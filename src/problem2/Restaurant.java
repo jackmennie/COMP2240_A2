@@ -17,6 +17,10 @@ public class Restaurant {
         return currentCapacity;
     }
 
+    public int getMaxCapacity() {
+        return MAX_CAPACITY;
+    }
+
     public void setCurrentCapacity(int currentCapacity) {
         this.currentCapacity = currentCapacity;
     }

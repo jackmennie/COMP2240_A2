@@ -2,7 +2,8 @@ package src;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.util.ArrayList;
+import java.util.ArrayDeque;
+import java.util.Queue;
 import java.util.Scanner;
 
 import src.problem2.Customer;
@@ -25,7 +26,7 @@ public class P2 {
             int eatingTime = 0;
             String id = "";
 
-            ArrayList<Customer> customers = new ArrayList<>();
+            Queue<Customer> customers = new ArrayDeque<>();
 
             while(scanner.hasNext()) {
                 if(scanner.hasNextInt() && isArrival) {
