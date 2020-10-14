@@ -8,13 +8,17 @@ public class Customer implements Runnable {
     private int leavingTime;
     private Restaurant restaurant;
     private int currentTime;
-    private boolean hasNotSeated;
+    private boolean isSeated;
 
     public Customer(String ID, int arrivalTime, int eatingTime) {
         this.ID = ID;
         this.arrivalTime = arrivalTime;
         this.eatingTime = eatingTime;
-        hasNotSeated = true;
+        isSeated = true;
+    }
+
+    public void getLog() {
+        System.out.printf("%-14s %-10d %-10d %-8d \n", ID, arrivalTime, seatedTime, leavingTime);
     }
 
     public int getEatingTime() {
@@ -40,43 +44,31 @@ public class Customer implements Runnable {
 
     @Override
     public void run() {
-        boolean isSeated = true;
-
-        while (isSeated) {
-            System.out.println("\t" + currentTime);
-            if (arrivalTime <= currentTime) {
-                
-                if(hasNotSeated) {
-                    System.out.println("Can seat");
-                    try {
-                        restaurant.getAccess().acquire();
-                        seatedTime = currentTime;
-                        hasNotSeated = false;
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                    
-                }
-
-               if(currentTime == (eatingTime + seatedTime)) {
-                   System.out.println("Can leave");
-                   leavingTime = currentTime;
-                   isSeated = false;
-               }
-            } else {
-                System.out.println("\tHave not arrived yet");
-            }
-
-            try {
-                Thread.sleep(500);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-
-            currentTime++;
+        try {
+            restaurant.getAccess().acquire();
+            // takes a seat.
+            seatedTime = restaurant.getTime();
+            isSeated = true;
+            leavingTime = seatedTime + eatingTime;
+            // take seat.
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
 
-        if(restaurant.getCurrentCapacity() == restaurant.getMaxCapacity()) {
+        while (isSeated) {
+            currentTime = restaurant.getTime();
+            if (leavingTime <= currentTime) {
+                // makes the total finished increment by 1.
+                restaurant.incrementTotalFinished(this);
+                // decrements the waitinguntil variable
+                restaurant.decrementCapacity();
+                isSeated = false;
+                break;
+            }
+        }
+
+        // only releases if there wasn't 5 people sitting at once.
+        if (restaurant.getWaitingUntil() < 0) {
             restaurant.getAccess().release();
         }
     }
