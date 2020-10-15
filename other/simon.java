@@ -46,7 +46,7 @@
 // // it starts the customers thread when they arrive.
 // for (int i = nextToArrive; i < customers.size(); i++) {
 // if (customers.get(i).getArrivalTime() > time) // the for loop is broken since
-// the list is in order
+// // the list is in order
 // // so none of the following will be able to enter.
 // {
 // nextToArrive = i;

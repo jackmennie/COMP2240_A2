@@ -2,8 +2,7 @@ package src;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.util.ArrayDeque;
-import java.util.Queue;
+import java.util.ArrayList;
 import java.util.Scanner;
 
 import src.problem2.Customer;
@@ -11,7 +10,7 @@ import src.problem2.Problem2;
 
 public class P2 {
     public static void main(String args[]) {
-        if(args.length != 1) {
+        if (args.length != 1) {
             System.out.println("You have not entered a file path!");
             System.exit(0);
         }
@@ -19,20 +18,20 @@ public class P2 {
         File file = new File(args[0]);
 
         try {
-            Scanner scanner = new Scanner(file).useDelimiter("[=\\,\\s+]");//Delimit on =, space and comma
+            Scanner scanner = new Scanner(file).useDelimiter("[=\\,\\s+]");// Delimit on =, space and comma
 
             boolean isArrival = true;
             int arrivalTime = 0;
             int eatingTime = 0;
             String id = "";
 
-            Queue<Customer> customers = new ArrayDeque<>();
+            ArrayList<Customer> customers = new ArrayList<>();
 
-            while(scanner.hasNext()) {
-                if(scanner.hasNextInt() && isArrival) {
+            while (scanner.hasNext()) {
+                if (scanner.hasNextInt() && isArrival) {
                     arrivalTime = scanner.nextInt();
                     isArrival = false;
-                } else if(scanner.hasNextInt() && !isArrival) {
+                } else if (scanner.hasNextInt() && !isArrival) {
                     eatingTime = scanner.nextInt();
                     isArrival = true;
 
@@ -40,10 +39,10 @@ public class P2 {
                     customers.add(customer);
                 } else {
                     String value = scanner.next();
-                    if(value != " ") {
+                    if (value != " ") {
                         id = value;
                     }
-                }  
+                }
             }
 
             scanner.close();
@@ -51,7 +50,7 @@ public class P2 {
             Problem2 problem = new Problem2();
             problem.init(customers);
             problem.run();
-        } catch(FileNotFoundException e) {
+        } catch (FileNotFoundException e) {
             System.out.println("Error reading file");
             e.printStackTrace();
         }
