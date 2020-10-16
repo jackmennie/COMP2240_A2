@@ -6,15 +6,9 @@ public class Problem2 {
     private ArrayList<Customer> customers = new ArrayList<>();
     private Restaurant restaurant;
 
-    private int time;
-
-    // boolean to do the rule if the 5 seats are taken. must wait till all have
-    // left.
     private boolean full = false, empty = false;
 
     public void init(ArrayList<Customer> customers) {
-        time = 0;
-
         restaurant = new Restaurant();
 
         // Customers need reference of the restaurant they are at
@@ -29,26 +23,32 @@ public class Problem2 {
     public void run() {
         int bookedSeats = customers.size();
 
-        // restaurant.getAccess().release(5); // Release 5 seats
-
         while (restaurant.getTotalFinished() < bookedSeats) {
+            System.out.print("Outer Loop | ");
+
             while (!full && !empty) {
-                if (restaurant.isCleaning()) {
-                    restaurant.cleanRestaurant();
-                }
+                System.out.print("1st Loop | ");
+                // if (restaurant.requiresCleaning() && !restaurant.isCleaning()) {
+                // restaurant.cleanRestaurant();
+                // }
 
                 if (restaurant.getTotalFinished() >= bookedSeats) {
                     empty = true;
                     break;
                 }
 
-                time = restaurant.getTime();
+                int time = restaurant.getTime();
+
+                System.out.println(time);
 
                 for (Customer customer : customers) {
-                    if (time == customer.getArrivalTime() && !customer.getStarted()) {
-                        new Thread(customer).start();
+                    if (customer.getArrivalTime() <= time && !customer.getStarted()) {
+                        if (restaurant.isOpen()) {
+                            System.out.println("\tStarting " + customer.getId());
+                            new Thread(customer).start();
 
-                        catchUpThreads(10);
+                            catchUpThreads(100);
+                        }
                     }
                 }
 
@@ -64,9 +64,16 @@ public class Problem2 {
             }
 
             // sets the waiting until 5 process's are done.
+            System.out.print("Set waiting until | ");
             restaurant.setWaitingUntil();
 
             while (full && !empty) {
+                System.out.print("2nd Loop | ");
+
+                // if (restaurant.requiresCleaning() && !restaurant.isCleaning()) {
+                // restaurant.cleanRestaurant();
+                // }
+
                 if (restaurant.isCleaning()) {
                     restaurant.cleanRestaurant();
                 }
@@ -76,17 +83,24 @@ public class Problem2 {
                     break;
                 }
 
-                time = restaurant.getTime();
+                int time = restaurant.getTime();
+                System.out.println(time);
 
                 for (Customer customer : customers) {
-                    if (time == customer.getArrivalTime() && !customer.getStarted()) {
-                        new Thread(customer).start();
+                    System.out.println(
+                            "Checking customer: " + customer.getId() + ", has started? " + customer.getStarted());
+                    if (customer.getArrivalTime() <= time && !customer.getStarted()) {
+                        if (restaurant.isOpen()) {
 
-                        catchUpThreads(10);
+                            System.out.println("\tStarting " + customer.getId());
+                            new Thread(customer).start();
+
+                            catchUpThreads(100);
+                        }
                     }
                 }
 
-                catchUpThreads(30);
+                catchUpThreads(100);
 
                 if (restaurant.getWaitingUntil() <= 0) {
                     full = false;
@@ -101,9 +115,13 @@ public class Problem2 {
             }
 
         }
+
+        System.out.print("Log | ");
         // prints out the "log" of the thread.
         System.out.printf("%-10s %-12s %-8s %-10s \n", "Customer", "arrives", "Seats", "Leaves");
-        for (int j = 0; j < customers.size(); j++) {
+        for (
+
+                int j = 0; j < customers.size(); j++) {
             customers.get(j).getLog();
         }
 

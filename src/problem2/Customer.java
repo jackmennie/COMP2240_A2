@@ -7,6 +7,10 @@ public class Customer implements Runnable {
     private boolean seated = false, started = false;
     private Restaurant restaurant;
 
+    public String getId() {
+        return id;
+    }
+
     // constructor giving the thread the gate, the semaphor and the id of the
     // thread.
     public Customer(String id, int arrivalTime, int eatingTime) {
@@ -23,35 +27,67 @@ public class Customer implements Runnable {
     public void run() {
         started = true;
 
-        try {
-            System.out.println("Permits: " + restaurant.getAccess().availablePermits());
-            restaurant.getAccess().acquire();
-            // takes a seat.
-            seatedTime = restaurant.getTime();
-            System.out.println("\t" + id + " got a seat at: " + seatedTime);
-            seated = true;
-            leavingTime = seatedTime + eatingTime;
-            // take seat.
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        while (true) {
 
-        while (seated) {
-            time = restaurant.getTime();
-            if (leavingTime <= time) {
-                // makes the total finished increment by 1.
-                restaurant.incrementTotalFinished();
-                // decrements the waitinguntil variable
-                restaurant.decrementWaitingUntil();
-                seated = false;
-                break;
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+                // e.printStackTrace();
             }
-        }
-        // only releases if there wasn't 5 people sitting at once.
-        if (restaurant.getWaitingUntil() < 0) {
-            System.out.println("All customers have left");
-            restaurant.prepareRestaurantToClean();
-            restaurant.getAccess().release();
+
+            System.out.println("\t\tPermits: " + restaurant.getAccess().availablePermits());
+            if (this.restaurant.getAccess().availablePermits() > 0) {
+                try {
+                    System.out.println("\t\tPermits: " + restaurant.getAccess().availablePermits());
+                    restaurant.getAccess().acquire();
+
+                    if (this.restaurant.getAccess().availablePermits() == 0) {
+                        this.restaurant.closeRestaurant();
+                    }
+
+                    // takes a seat.
+                    seatedTime = restaurant.getTime();
+                    System.out.println("\t\t" + id + " got a seat at: " + seatedTime);
+                    seated = true;
+                    leavingTime = seatedTime + eatingTime;
+                    // take seat.
+
+                    while (seated) {
+                        time = restaurant.getTime();
+                        if (leavingTime <= time) {
+                            // makes the total finished increment by 1.
+                            restaurant.incrementTotalFinished();
+                            // decrements the waitinguntil variable
+                            restaurant.decrementWaitingUntil();
+                            seated = false;
+                            break;
+                        }
+                    }
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+
+                // // only releases if there wasn't 5 people sitting at once.
+                // if (restaurant.getWaitingUntil() < 0) {
+                // System.out.println("All customers have left");
+                // restaurant.prepareRestaurantToClean();
+                // restaurant.getAccess().release();
+                // }
+            } else {
+                // only releases if there wasn't 5 people sitting at once.
+                // restaurant.prepareRestaurantToClean();
+
+                if (restaurant.getWaitingUntil() <= 0) {
+                    System.out.println("\t\tAll customers have left");
+
+                    restaurant.prepareForCleaning();
+                    restaurant.cleanRestaurant();
+                    restaurant.getAccess().release();
+
+                    System.out.println("\t\t\tThread is done for: " + this.id);
+                    break;
+                }
+            }
         }
     }
 
