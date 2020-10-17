@@ -78,12 +78,12 @@ public class Restaurant {
     }
 
     public boolean cleanRestaurant() {
-        try {
-            Thread.sleep(1000);
-            cleaningTime++;
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        // try {
+        // Thread.sleep(10);
+        // cleaningTime++;
+        // } catch (InterruptedException e) {
+        // e.printStackTrace();
+        // }
 
         if (cleaning) {
             System.out.println("Cleaning restaurant");
@@ -91,7 +91,7 @@ public class Restaurant {
                 this.cleaningLock.acquire();
                 while (cleaningTime < maxCleaningTime) {
                     try {
-                        Thread.sleep(50);
+                        Thread.sleep(70);
                         System.out.print(".");
                         cleaningTime++;
                     } catch (InterruptedException e) {
