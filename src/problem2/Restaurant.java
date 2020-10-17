@@ -8,8 +8,9 @@ public class Restaurant {
     private int totalFinished;
     private boolean isOpen;
 
-    private int cleaningTime;
     private int maxCleaningTime;
+    private boolean isCleaning = false;
+    private int startedCleaning;
 
     private Semaphore controller = new Semaphore(5, true);
     private Semaphore waitingController = new Semaphore(1, true);
@@ -24,7 +25,6 @@ public class Restaurant {
         time = 0;
         totalFinished = 0;
         waitUntil = 0;
-        cleaningTime = 0;
         maxCleaningTime = 5;
         isOpen = true;
         availableSeats = 5;
@@ -58,16 +58,11 @@ public class Restaurant {
         availableSeats = 5;
     }
 
-    public boolean isCleaning = false;
-    public int startedCleaning;
-
     public void isCleaning() {
         if (isCleaning) {
-            System.out.println("\t\t\tCleaning...");
             if ((startedCleaning + maxCleaningTime) == time) {
                 isCleaning = false;
 
-                System.out.println("\t\tCleaning done");
                 setWaitingUntil();
                 this.cleaningLock.release();
                 this.controller.release(5);
@@ -82,7 +77,6 @@ public class Restaurant {
         startedCleaning = time;
 
         try {
-            System.out.println("\t\tCleaning restaurant until " + (startedCleaning + maxCleaningTime));
             this.cleaningLock.acquire();
 
         } catch (InterruptedException e) {
@@ -201,10 +195,7 @@ public class Restaurant {
     }
 
     public void leaveRestaurant(String id) {
-        System.out.println(id + "\tCustomer is gone, customers left: " + getWaitingUntil());
-
         if (getWaitingUntil() == 0) {
-            System.out.println("\t\tAll customers have gone");
             cleanRestaurant();
         }
     }

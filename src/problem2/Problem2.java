@@ -17,14 +17,12 @@ public class Problem2 {
         }
 
         this.customers = customers;
-        System.out.println("Problem initialised with: " + customers.size() + " customers");
     }
 
     public void run() {
         int bookedSeats = customers.size();
 
         while (restaurant.getCompleted(bookedSeats)) {
-            System.out.println("Outer Loop");
             while (!full && !empty) {
                 if (restaurant.getTotalFinished() >= bookedSeats) {
                     empty = true;
@@ -34,12 +32,10 @@ public class Problem2 {
                 restaurant.isCleaning();
 
                 int time = restaurant.getTime();
-                System.out.println("\n!F!E\tTIME: " + time);
 
                 for (Customer customer : customers) {
                     if (customer.getArrivalTime() <= time && !customer.getStarted()) {
                         if (restaurant.isOpen()) {
-                            System.out.println("\tStarting " + customer.getId());
                             new Thread(customer).start();
 
                         }
@@ -56,7 +52,6 @@ public class Problem2 {
             }
 
             // sets the waiting until 5 process's are done.
-            System.out.print("Set waiting until | ");
             restaurant.setWaitingUntil();
 
             while (full && !empty) {
@@ -68,13 +63,11 @@ public class Problem2 {
                 restaurant.isCleaning();
 
                 int time = restaurant.getTime();
-                System.out.println("\nF!E\tTIME: " + time);
 
                 for (Customer customer : customers) {
                     if (customer.getArrivalTime() <= time && !customer.getStarted()) {
                         if (restaurant.isOpen()) {
 
-                            System.out.println("\tStarting " + customer.getId());
                             new Thread(customer).start();
 
                         }

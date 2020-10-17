@@ -28,13 +28,10 @@ public class Customer implements Runnable {
     @Override
     public void run() {
         while (!finished) {
-            System.out.println("\t\tPermits: " + restaurant.getAccess().availablePermits());
-
             if (this.restaurant.getAccess().availablePermits() > 0 && !started) {
                 started = true;
 
                 try {
-                    System.out.println("\t\tPermits: " + restaurant.getAccess().availablePermits());
                     restaurant.getAccess().acquire();
 
                     if (this.restaurant.getAccess().availablePermits() == 0) {
@@ -43,7 +40,6 @@ public class Customer implements Runnable {
 
                     // takes a seat.
                     seatedTime = restaurant.getTime();
-                    System.out.println("\t\t" + id + " got a seat at: " + seatedTime);
                     seated = true;
                     leavingTime = seatedTime + eatingTime;
                     // take seat.
@@ -66,19 +62,7 @@ public class Customer implements Runnable {
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-
-                // // only releases if there wasn't 5 people sitting at once.
-                // if (restaurant.getWaitingUntil() < 0) {
-                // System.out.println("All customers have left");
-                // restaurant.prepareRestaurantToClean();
-                // restaurant.getAccess().release();
-                // }
-            } else {
-                System.out.println("SHOULD NEVER GET HIT");
-                // leavingFunction();
             }
-
-            System.out.println("I am getting here for infinite time");
         }
     }
 
