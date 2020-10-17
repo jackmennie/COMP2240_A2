@@ -1,7 +1,6 @@
 package src.problem3;
 
 import java.util.ArrayList;
-import java.util.concurrent.Semaphore;
 
 public class Restaurant {
 
@@ -15,8 +14,6 @@ public class Restaurant {
 
     private ArrayList<Seat> seats;
     private final int maxSeats = 5;
-
-    private Semaphore customerCountController = new Semaphore(1, true);
 
     public Restaurant() {
         time = 0;
@@ -170,43 +167,16 @@ public class Restaurant {
 
     // increments the total finished by 1.
     public void incrementTotalFinished() {
-        try {
-            customerCountController.acquire();
-            totalFinished++;
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        customerCountController.release();
+        totalFinished++;
     }
 
     // returns the total finished.
-    synchronized public int getTotalFinished() {
-        try {
-            customerCountController.acquire();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        customerCountController.release();
-
+    public int getTotalFinished() {
         return totalFinished;
     }
 
-    synchronized public boolean getCompleted(int bookedSeats) {
-        boolean temp = false;
-        try {
-            customerCountController.acquire();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        customerCountController.release();
-
-        if (totalFinished < bookedSeats) {
-            temp = true;
-        } else {
-            customerCountController.release();
-        }
-
-        return temp;
+    public boolean getCompleted(int bookedSeats) {
+        return totalFinished < bookedSeats;
     }
 
     public void leaveRestaurant(String id) {
