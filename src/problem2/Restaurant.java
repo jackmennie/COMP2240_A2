@@ -58,21 +58,32 @@ public class Restaurant {
         availableSeats = 5;
     }
 
-    public void cleanRestaurant() {
-        try {
-            this.cleaningLock.acquire();
-            while (cleaningTime < maxCleaningTime) {
-                try {
-                    Thread.sleep(70);
-                    cleaningTime++;
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
+    public boolean isCleaning = false;
+    public int startedCleaning;
 
-            this.cleaningLock.release();
-            cleaningTime = 0;
-            isOpen = true;
+    public void isCleaning() {
+        if (isCleaning) {
+            System.out.println("\t\t\tCleaning...");
+            if ((startedCleaning + maxCleaningTime) == time) {
+                isCleaning = false;
+
+                System.out.println("\t\tCleaning done");
+                setWaitingUntil();
+                this.cleaningLock.release();
+                this.controller.release(5);
+
+                isOpen = true;
+            }
+        }
+    }
+
+    public void cleanRestaurant() {
+        isCleaning = true;
+        startedCleaning = time;
+
+        try {
+            System.out.println("\t\tCleaning restaurant until " + (startedCleaning + maxCleaningTime));
+            this.cleaningLock.acquire();
 
         } catch (InterruptedException e) {
             e.printStackTrace();
@@ -117,6 +128,12 @@ public class Restaurant {
     // increments time by 1.
     public void incrementTime() {
         try {
+            Thread.sleep(100);
+        } catch (InterruptedException ie) {
+            // Handle the exception
+        }
+
+        try {
             timerController.acquire();
             time++;
         } catch (InterruptedException e) {
@@ -152,16 +169,43 @@ public class Restaurant {
 
     // returns the total finished.
     synchronized public int getTotalFinished() {
-        int temp = 0;
         try {
             customerCountController.acquire();
-            temp = totalFinished;
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
         customerCountController.release();
 
+        return totalFinished;
+    }
+
+    synchronized public boolean getCompleted(int bookedSeats) {
+        boolean temp = false;
+        try {
+            customerCountController.acquire();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        customerCountController.release();
+
+        if (totalFinished < bookedSeats) {
+            temp = true;
+        } else {
+            cleaningLock.release();
+            waitingController.release();
+            customerCountController.release();
+            timerController.release();
+        }
+
         return temp;
     }
 
+    public void leaveRestaurant(String id) {
+        System.out.println(id + "\tCustomer is gone, customers left: " + getWaitingUntil());
+
+        if (getWaitingUntil() == 0) {
+            System.out.println("\t\tAll customers have gone");
+            cleanRestaurant();
+        }
+    }
 }

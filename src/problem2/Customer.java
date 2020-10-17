@@ -6,6 +6,7 @@ public class Customer implements Runnable {
     private int time = 0;
     private boolean seated = false, started = false;
     private Restaurant restaurant;
+    private boolean finished;
 
     public String getId() {
         return id;
@@ -17,6 +18,7 @@ public class Customer implements Runnable {
         this.id = id;
         this.arrivalTime = arrivalTime;
         this.eatingTime = eatingTime;
+        finished = false;
     }
 
     public void arriveAtRestaurant(Restaurant restaurant) {
@@ -25,17 +27,7 @@ public class Customer implements Runnable {
 
     @Override
     public void run() {
-
-        boolean finished = false;
-
         while (!finished) {
-
-            try {
-                Thread.sleep(100);
-            } catch (InterruptedException e) {
-                // e.printStackTrace();
-            }
-
             System.out.println("\t\tPermits: " + restaurant.getAccess().availablePermits());
 
             if (this.restaurant.getAccess().availablePermits() > 0 && !started) {
@@ -63,13 +55,12 @@ public class Customer implements Runnable {
                             restaurant.incrementTotalFinished();
                             // decrements the waitinguntil variable
                             restaurant.decrementWaitingUntil();
+
                             seated = false;
 
+                            restaurant.leaveRestaurant(id);
                             finished = true;
-
-                            leavingFunction();
-
-                            break;
+                            // leavingFunction();
                         }
                     }
                 } catch (InterruptedException e) {
@@ -84,25 +75,10 @@ public class Customer implements Runnable {
                 // }
             } else {
                 System.out.println("SHOULD NEVER GET HIT");
+                // leavingFunction();
             }
 
             System.out.println("I am getting here for infinite time");
-        }
-    }
-
-    public void leavingFunction() {
-        System.out.println("\tI am here infinite time: " + restaurant.getWaitingUntil());
-        // only releases if there wasn't 5 people sitting at once.
-        // restaurant.prepareRestaurantToClean();
-
-        if (restaurant.getWaitingUntil() == 0) {
-            System.out.println("\t\tAll customers have left");
-
-            // restaurant.prepareForCleaning();
-            restaurant.cleanRestaurant();
-            restaurant.getAccess().release();
-
-            System.out.println("\t\t\tThread is done for: " + this.id);
         }
     }
 

@@ -23,20 +23,18 @@ public class Problem2 {
     public void run() {
         int bookedSeats = customers.size();
 
-        while (restaurant.getTotalFinished() < bookedSeats) {
-            System.out.print("Outer Loop | ");
-
+        while (restaurant.getCompleted(bookedSeats)) {
+            System.out.println("Outer Loop");
             while (!full && !empty) {
-                System.out.print("1st Loop | ");
-
                 if (restaurant.getTotalFinished() >= bookedSeats) {
                     empty = true;
                     break;
                 }
 
-                int time = restaurant.getTime();
+                restaurant.isCleaning();
 
-                System.out.println(time);
+                int time = restaurant.getTime();
+                System.out.println("\n!F!E\tTIME: " + time);
 
                 for (Customer customer : customers) {
                     if (customer.getArrivalTime() <= time && !customer.getStarted()) {
@@ -44,12 +42,9 @@ public class Problem2 {
                             System.out.println("\tStarting " + customer.getId());
                             new Thread(customer).start();
 
-                            catchUpThreads(100);
                         }
                     }
                 }
-
-                catchUpThreads(50);
 
                 if (restaurant.getAccess().availablePermits() == 0) {
                     full = true;
@@ -65,15 +60,15 @@ public class Problem2 {
             restaurant.setWaitingUntil();
 
             while (full && !empty) {
-                System.out.print("2nd Loop | ");
-
                 if (restaurant.getTotalFinished() >= bookedSeats) {
                     empty = true;
                     break;
                 }
 
+                restaurant.isCleaning();
+
                 int time = restaurant.getTime();
-                System.out.println(time);
+                System.out.println("\nF!E\tTIME: " + time);
 
                 for (Customer customer : customers) {
                     if (customer.getArrivalTime() <= time && !customer.getStarted()) {
@@ -82,28 +77,23 @@ public class Problem2 {
                             System.out.println("\tStarting " + customer.getId());
                             new Thread(customer).start();
 
-                            catchUpThreads(100);
                         }
                     }
                 }
 
-                catchUpThreads(100);
-
                 if (restaurant.getWaitingUntil() <= 0) {
                     full = false;
-                    restaurant.getAccess().release(5);
+                    // resta?urant.getAccess().release(5);
                     break;
 
-                } else {
-
-                    restaurant.incrementTime();
                 }
+
+                restaurant.incrementTime();
 
             }
 
         }
 
-        System.out.print("Log | ");
         // prints out the "log" of the thread.
         System.out.printf("%-10s %-12s %-8s %-10s \n", "Customer", "arrives", "Seats", "Leaves");
         for (
@@ -112,20 +102,5 @@ public class Problem2 {
             customers.get(j).getLog();
         }
 
-    }
-
-    /**
-     * Catch up threads prevents java from running threads out of order Since this
-     * program requires customers coming in at a certain time we do not want to
-     * allow a later customer to go before an earlier one
-     * 
-     * @param amount
-     */
-    private void catchUpThreads(int amount) {
-        try {
-            Thread.sleep(amount);
-        } catch (InterruptedException ie) {
-            // Handle the exception
-        }
     }
 }
