@@ -33,6 +33,7 @@ public class Customer implements Runnable {
 
                 try {
                     restaurant.getASeat(this);
+                    System.out.println("\t\t" + id + " got a seat");
 
                     if (restaurant.getAvailableSeats() == 0) {
                         this.restaurant.closeRestaurant();
@@ -47,6 +48,7 @@ public class Customer implements Runnable {
                     while (seated) {
                         time = restaurant.getTime();
                         if (leavingTime <= time) {
+                            System.out.println("\t\t" + id + " has finished");
                             // makes the total finished increment by 1.
                             restaurant.incrementTotalFinished();
                             // decrements the waitinguntil variable

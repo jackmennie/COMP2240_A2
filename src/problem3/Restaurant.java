@@ -21,19 +21,26 @@ public class Restaurant {
     private Semaphore timerController = new Semaphore(1, true);
     private Semaphore customerCountController = new Semaphore(1, true);
 
-    private int availableSeats;
-
-    private Semaphore cleaningLock = new Semaphore(1, true);
-
     public Restaurant() {
         time = 0;
         totalFinished = 0;
         waitUntil = 0;
         maxCleaningTime = 5;
         isOpen = true;
-        availableSeats = 5;
 
         seats = new ArrayList<>();
+
+        for (int i = 0; i < maxSeats; i++) {
+            seats.add(new Seat(this));
+        }
+
+        setWaitingUntil();
+    }
+
+    public void resetSeats() {
+        for (Seat seat : seats) {
+            seat.resetSeat();
+        }
     }
 
     public boolean isOpen() {
@@ -55,11 +62,15 @@ public class Restaurant {
             for (Seat seat : seats) {
                 try {
                     seat.getSeatForCustomer(customer);
+                    System.out.println("\t\tThere is a seat for: " + customer.getId());
                     break;
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    // e.printStackTrace();
+                    // throw e;
                 }
             }
+        } else {
+            System.out.println("there is not available seats");
         }
     }
 
@@ -74,25 +85,26 @@ public class Restaurant {
     }
 
     public int getAvailableSeats() {
-        return maxSeats - seats.size();
+        int count = 0;
+
+        for (Seat seat : seats) {
+            if (!seat.isTaken()) {
+                count++;
+            }
+        }
+
+        return count;
     }
 
-    public void decrementAvailableSeats() {
-        availableSeats--;
-    }
-
-    public void resetAvailableSeats() {
-        availableSeats = 5;
-    }
-
-    public void isCleaning() {
+    public synchronized void isCleaning() {
         if (isCleaning) {
+            System.out.println("\t\tCleaning");
             if ((startedCleaning + maxCleaningTime) == time) {
                 isCleaning = false;
 
                 setWaitingUntil();
-                this.cleaningLock.release();
-                // this.controller.release(5);
+                // this.cleaningLock.release();
+                resetSeats();
 
                 isOpen = true;
             }
@@ -103,12 +115,12 @@ public class Restaurant {
         isCleaning = true;
         startedCleaning = time;
 
-        try {
-            this.cleaningLock.acquire();
+        // try {
+        // this.cleaningLock.acquire();
 
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        // } catch (InterruptedException e) {
+        // e.printStackTrace();
+        // }
     }
 
     // sets the waiting until all 5 customers leave their seats.
@@ -212,7 +224,6 @@ public class Restaurant {
         if (totalFinished < bookedSeats) {
             temp = true;
         } else {
-            cleaningLock.release();
             waitingController.release();
             customerCountController.release();
             timerController.release();
@@ -222,7 +233,9 @@ public class Restaurant {
     }
 
     public void leaveRestaurant(String id) {
+        System.out.println("\t\t\tWaiting for customers to leave: " + getWaitingUntil());
         if (getWaitingUntil() == 0) {
+            System.out.println("\t\tAll customers have left: ");
             cleanRestaurant();
         }
     }

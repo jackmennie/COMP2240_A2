@@ -21,4 +21,8 @@ public class Seat {
     public boolean isTaken() {
         return isTaken;
     }
+
+    public void resetSeat() {
+        this.isTaken = false;
+    }
 }
