@@ -13,11 +13,9 @@ public class Restaurant {
     private boolean isCleaning = false;
     private int startedCleaning;
 
-    // private Semaphore controller = new Semaphore(5, true);
     private ArrayList<Seat> seats;
     private final int maxSeats = 5;
 
-    private Semaphore waitingController = new Semaphore(1, true);
     private Semaphore timerController = new Semaphore(1, true);
     private Semaphore customerCountController = new Semaphore(1, true);
 
@@ -65,8 +63,7 @@ public class Restaurant {
                     System.out.println("\t\tThere is a seat for: " + customer.getId());
                     break;
                 } catch (Exception e) {
-                    // e.printStackTrace();
-                    // throw e;
+                    // Do nothing with the exception
                 }
             }
         } else {
@@ -114,47 +111,34 @@ public class Restaurant {
     public void cleanRestaurant() {
         isCleaning = true;
         startedCleaning = time;
-
-        // try {
-        // this.cleaningLock.acquire();
-
-        // } catch (InterruptedException e) {
-        // e.printStackTrace();
-        // }
     }
 
     // sets the waiting until all 5 customers leave their seats.
-    public void setWaitingUntil() {
+    public synchronized void setWaitingUntil() {
         try {
-            waitingController.acquire();
             waitUntil = 5;
-        } catch (InterruptedException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
-        waitingController.release();
     }
 
     // one customer has left his seat.
-    public void decrementWaitingUntil() {
+    public synchronized void decrementWaitingUntil() {
         try {
-            waitingController.acquire();
             waitUntil--;
-        } catch (InterruptedException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
-        waitingController.release();
     }
 
     // returns the remaining amount of customers.
-    synchronized public int getWaitingUntil() {
+    public synchronized int getWaitingUntil() {
         int temp = 0;
         try {
-            waitingController.acquire();
             temp = waitUntil;
-        } catch (InterruptedException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
-        waitingController.release();
         return temp;
     }
 
@@ -163,7 +147,7 @@ public class Restaurant {
         try {
             Thread.sleep(100);
         } catch (InterruptedException ie) {
-            // Handle the exception
+            // Do nothing with the exception
         }
 
         try {
@@ -224,7 +208,6 @@ public class Restaurant {
         if (totalFinished < bookedSeats) {
             temp = true;
         } else {
-            waitingController.release();
             customerCountController.release();
             timerController.release();
         }
