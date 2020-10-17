@@ -16,7 +16,6 @@ public class Restaurant {
     private ArrayList<Seat> seats;
     private final int maxSeats = 5;
 
-    private Semaphore timerController = new Semaphore(1, true);
     private Semaphore customerCountController = new Semaphore(1, true);
 
     public Restaurant() {
@@ -151,25 +150,21 @@ public class Restaurant {
         }
 
         try {
-            timerController.acquire();
             time++;
-        } catch (InterruptedException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
-        timerController.release();
     }
 
     // returns the "time".
     synchronized public int getTime() {
         int temp = 0;
         try {
-            timerController.acquire();
-
             temp = time;
-        } catch (InterruptedException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
-        timerController.release();
+
         return temp;
     }
 
@@ -209,7 +204,6 @@ public class Restaurant {
             temp = true;
         } else {
             customerCountController.release();
-            timerController.release();
         }
 
         return temp;
