@@ -1,9 +1,8 @@
-package src.problem2;
-//REMOVE SYNC FROM P2
+package src.problem3;
 
 import java.util.ArrayList;
 
-public class Problem2 {
+public class Problem3 {
     private ArrayList<Customer> customers = new ArrayList<>();
     private Restaurant restaurant;
 
@@ -33,17 +32,20 @@ public class Problem2 {
                 restaurant.isCleaning();
 
                 int time = restaurant.getTime();
+                System.out.println("!F!E TIME: " + time);
 
                 for (Customer customer : customers) {
                     if (customer.getArrivalTime() <= time && !customer.getStarted()) {
+
                         if (restaurant.isOpen()) {
+                            System.out.println("\tStarting thread for: " + customer.getId());
                             new Thread(customer).start();
 
                         }
                     }
                 }
 
-                if (restaurant.getAccess().availablePermits() == 0) {
+                if (restaurant.getAvailableSeats() == 0) {
                     full = true;
                     break;
                 }
@@ -64,11 +66,12 @@ public class Problem2 {
                 restaurant.isCleaning();
 
                 int time = restaurant.getTime();
+                System.out.println("F!E TIME: " + time);
 
                 for (Customer customer : customers) {
                     if (customer.getArrivalTime() <= time && !customer.getStarted()) {
                         if (restaurant.isOpen()) {
-
+                            System.out.println("\tStarting thread for: " + customer.getId());
                             new Thread(customer).start();
 
                         }
