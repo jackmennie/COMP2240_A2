@@ -21,7 +21,8 @@
       "type": "java",
       "name": "Debug (Launch)-P2",
       "request": "launch",
-      "mainClass": "src.P2"
+      "mainClass": "src.P2",
+      "args": "src/problem2/P2-1in.txt"
     },
     {
       "type": "java",
