@@ -28,9 +28,6 @@ public class Problem2 {
 
             while (!full && !empty) {
                 System.out.print("1st Loop | ");
-                // if (restaurant.requiresCleaning() && !restaurant.isCleaning()) {
-                // restaurant.cleanRestaurant();
-                // }
 
                 if (restaurant.getTotalFinished() >= bookedSeats) {
                     empty = true;
@@ -70,14 +67,6 @@ public class Problem2 {
             while (full && !empty) {
                 System.out.print("2nd Loop | ");
 
-                // if (restaurant.requiresCleaning() && !restaurant.isCleaning()) {
-                // restaurant.cleanRestaurant();
-                // }
-
-                if (restaurant.isCleaning()) {
-                    restaurant.cleanRestaurant();
-                }
-
                 if (restaurant.getTotalFinished() >= bookedSeats) {
                     empty = true;
                     break;
@@ -87,8 +76,6 @@ public class Problem2 {
                 System.out.println(time);
 
                 for (Customer customer : customers) {
-                    System.out.println(
-                            "Checking customer: " + customer.getId() + ", has started? " + customer.getStarted());
                     if (customer.getArrivalTime() <= time && !customer.getStarted()) {
                         if (restaurant.isOpen()) {
 

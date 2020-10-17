@@ -6,7 +6,6 @@ public class Restaurant {
 
     private int time, waitUntil;
     private int totalFinished;
-    private boolean isCleaning;
     private boolean isOpen;
 
     private int cleaningTime;
@@ -25,7 +24,6 @@ public class Restaurant {
         time = 0;
         totalFinished = 0;
         waitUntil = 0;
-        isCleaning = false;
         cleaningTime = 0;
         maxCleaningTime = 5;
         isOpen = true;
@@ -60,64 +58,25 @@ public class Restaurant {
         availableSeats = 5;
     }
 
-    boolean requiresClean = false;
-
-    public void prepareRestaurantToClean() {
-        requiresClean = true;
-    }
-
-    boolean cleaning = false;
-
-    public void prepareForCleaning() {
-        cleaning = true;
-        requiresClean = true;
-    }
-
-    public boolean requiresCleaning() {
-        return requiresClean;
-    }
-
-    public boolean cleanRestaurant() {
-        // try {
-        // Thread.sleep(10);
-        // cleaningTime++;
-        // } catch (InterruptedException e) {
-        // e.printStackTrace();
-        // }
-
-        if (cleaning) {
-            System.out.println("Cleaning restaurant");
-            try {
-                this.cleaningLock.acquire();
-                while (cleaningTime < maxCleaningTime) {
-                    try {
-                        Thread.sleep(70);
-                        System.out.print(".");
-                        cleaningTime++;
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
+    public void cleanRestaurant() {
+        try {
+            this.cleaningLock.acquire();
+            while (cleaningTime < maxCleaningTime) {
+                try {
+                    Thread.sleep(70);
+                    cleaningTime++;
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
                 }
-
-                System.out.println("Cleaning is done");
-                this.cleaningLock.release();
-                cleaningTime = 0;
-                cleaning = false;
-                requiresClean = false;
-                isOpen = true;
-
-                return true;
-            } catch (InterruptedException e) {
-                e.printStackTrace();
             }
 
+            this.cleaningLock.release();
+            cleaningTime = 0;
+            isOpen = true;
+
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
-
-        return true;
-    }
-
-    public boolean isCleaning() {
-        return cleaning;
     }
 
     // sets the waiting until all 5 customers leave their seats.

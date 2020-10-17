@@ -98,7 +98,7 @@ public class Customer implements Runnable {
         if (restaurant.getWaitingUntil() == 0) {
             System.out.println("\t\tAll customers have left");
 
-            restaurant.prepareForCleaning();
+            // restaurant.prepareForCleaning();
             restaurant.cleanRestaurant();
             restaurant.getAccess().release();
 
