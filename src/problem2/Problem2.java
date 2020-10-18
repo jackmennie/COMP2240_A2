@@ -40,10 +40,8 @@ public class Problem2 {
      * Runs customer threads when they should be ran
      */
     public void run() {
-
         // While there is customers to be completed as per the booked night
         while (restaurant.isPendingCustomers(bookedSeats)) {
-
             // While there is atleast one customer, then perform restaurant logic
             while (!fullRestaurant && !hasProcessedAllBooked) {
                 if (checkCustomerAndPermitToEnter()) {
@@ -83,9 +81,7 @@ public class Problem2 {
 
         // prints out the "log" of the thread.
         System.out.printf("%-10s %-12s %-8s %-10s \n", "Customer", "arrives", "Seats", "Leaves");
-        for (
-
-                int j = 0; j < customers.size(); j++) {
+        for (int j = 0; j < customers.size(); j++) {
             customers.get(j).getLog();
         }
 

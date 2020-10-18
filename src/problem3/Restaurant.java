@@ -1,5 +1,13 @@
 package src.problem3;
 
+/**
+ * Jack Mennie
+ * C3238004
+ * 
+ * The COVID-Safe Restaurant
+ * Using Monitor 
+ */
+
 import java.util.ArrayList;
 
 public class Restaurant {
@@ -16,9 +24,12 @@ public class Restaurant {
     // Wow no more semaphores
     private ArrayList<Seat> seats;
 
+    /**
+     * Construct that restaurant We are open for Business^
+     * 
+     * ^only to 5 customers at a time
+     */
     public Restaurant() {
-        time = 0;
-        totalFinished = 0;
         waitingCount = MAX_SEATS;
         isOpen = true;
 
@@ -29,24 +40,40 @@ public class Restaurant {
         }
     }
 
+    /**
+     * Once the customers have all left their seats and cleaning is done, this
+     * function will be called which sets each seat to available
+     */
     public void resetSeats() {
         for (Seat seat : seats) {
             seat.resetSeat();
         }
     }
 
+    /**
+     * @return boolean if restaurant is open or not
+     */
     public boolean isOpen() {
         return isOpen;
     }
 
+    /**
+     * Close the restaurant
+     */
     public void closeRestaurant() {
         isOpen = false;
     }
 
-    public void openRestaurant() {
-        isOpen = true;
-    }
-
+    /**
+     * The main monitor. Instead of using a Semaphore to acquire
+     * 
+     * This uses synchronisation to get a seat from the seat class
+     * 
+     * Loops for each seat to find if one is available
+     * 
+     * @param customer
+     * @throws Exception
+     */
     public synchronized void getASeat(Customer customer) throws Exception {
         // check if full
         if (restaurantHasAvailabeSeats()) {
@@ -62,6 +89,11 @@ public class Restaurant {
         }
     }
 
+    /**
+     * Goes through each seat to see if there is atleast one available
+     * 
+     * @return
+     */
     public boolean restaurantHasAvailabeSeats() {
         for (Seat seat : seats) {
             if (!seat.isTaken()) {
@@ -72,6 +104,12 @@ public class Restaurant {
         return false;
     }
 
+    /**
+     * Goes through each seat to see if there is a seat available and adds to the
+     * count to be returned
+     * 
+     * @return
+     */
     public int getAvailableSeats() {
         int count = 0;
 
@@ -84,7 +122,10 @@ public class Restaurant {
         return count;
     }
 
-    public synchronized void isCleaning() {
+    /**
+     * Ongoing function that cleans the restaurant if cleaning is required.
+     */
+    public synchronized void cleanRestaurantIfRequired() {
         if (isCleaning) {
             if ((startedCleaningAtTime + MAX_CLEANING_TIME) == time) {
                 isCleaning = false;
@@ -97,12 +138,24 @@ public class Restaurant {
         }
     }
 
-    public void cleanRestaurant() {
+    /**
+     * All customers that have been eating have finally left We can now deep clean
+     * the restaurant
+     * 
+     * Toggle that to true, set the startCleaningAtTime to the current time Acquire
+     * that lock, so the other threads does not modify that time value
+     */
+    public void prepareRestaurantToClean() {
         isCleaning = true;
         startedCleaningAtTime = time;
     }
 
-    // sets the waiting until all 5 customers leave their seats.
+    /**
+     * Once the max amount of customers have seated This sets that number, and
+     * tracks when they have finished eating.
+     * 
+     * This is used for the cleaning function once the waiting count is 0.
+     */
     public synchronized void setWaitingUntil() {
         try {
             waitingCount = MAX_SEATS;
@@ -111,7 +164,9 @@ public class Restaurant {
         }
     }
 
-    // one customer has left his seat.
+    /**
+     * Once the customer have left their seat, then decrease the waiting count
+     */
     public synchronized void decrementWaitingUntil() {
         try {
             waitingCount--;
@@ -120,7 +175,10 @@ public class Restaurant {
         }
     }
 
-    // returns the remaining amount of customers.
+    /**
+     * 
+     * @return the amount of customers still eating
+     */
     public synchronized int getWaitingUntil() {
         int temp = 0;
         try {
@@ -131,7 +189,9 @@ public class Restaurant {
         return temp;
     }
 
-    // increments time by 1.
+    /**
+     * Increments the time by 1
+     */
     public void incrementTime() {
         try {
             Thread.sleep(100);
@@ -146,7 +206,9 @@ public class Restaurant {
         }
     }
 
-    // returns the "time".
+    /**
+     * @return the current time
+     */
     synchronized public int getTime() {
         int temp = 0;
         try {
@@ -158,23 +220,40 @@ public class Restaurant {
         return temp;
     }
 
-    // increments the total finished by 1.
+    /**
+     * Add a customer to the total finished count
+     */
     public void incrementTotalFinished() {
         totalFinished++;
     }
 
-    // returns the total finished.
+    /**
+     * @return the amount of finished customers
+     */
     public int getTotalFinished() {
         return totalFinished;
     }
 
+    /**
+     * Similar to the above function, but returns true if the count is < the booked
+     * seat number
+     * 
+     * @param bookedSeats
+     * @return true if more customers are required to be processed
+     */
     public boolean getCompleted(int bookedSeats) {
         return totalFinished < bookedSeats;
     }
 
+    /**
+     * Customer is done, they leave their seat Once there is no remaining customers,
+     * then prepare the restuarant to clean
+     * 
+     * @param id
+     */
     public void leaveRestaurant(String id) {
         if (getWaitingUntil() == 0) {
-            cleanRestaurant();
+            prepareRestaurantToClean();
         }
     }
 }

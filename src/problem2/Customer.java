@@ -12,7 +12,7 @@ package src.problem2;
  */
 
 public class Customer implements Runnable {
-    // Customer stats
+    // Customer attributes
     private String id;
     private int arrivalTime;
     private int eatingTime;
