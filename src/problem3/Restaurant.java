@@ -3,32 +3,29 @@ package src.problem3;
 import java.util.ArrayList;
 
 public class Restaurant {
+    private final int MAX_CLEANING_TIME = 5;
+    private final int MAX_SEATS = 5;
 
-    private int time, waitUntil;
+    private int time;
+    private int waitingCount;
     private int totalFinished;
     private boolean isOpen;
-
-    private int maxCleaningTime;
     private boolean isCleaning = false;
     private int startedCleaning;
 
     private ArrayList<Seat> seats;
-    private final int maxSeats = 5;
 
     public Restaurant() {
         time = 0;
         totalFinished = 0;
-        waitUntil = 0;
-        maxCleaningTime = 5;
+        waitingCount = MAX_SEATS;
         isOpen = true;
 
         seats = new ArrayList<>();
 
-        for (int i = 0; i < maxSeats; i++) {
-            seats.add(new Seat(this));
+        for (int i = 0; i < MAX_SEATS; i++) {
+            seats.add(new Seat());
         }
-
-        setWaitingUntil();
     }
 
     public void resetSeats() {
@@ -56,14 +53,11 @@ public class Restaurant {
             for (Seat seat : seats) {
                 try {
                     seat.getSeatForCustomer(customer);
-                    System.out.println("\t\tThere is a seat for: " + customer.getId());
                     break;
                 } catch (Exception e) {
                     // Do nothing with the exception
                 }
             }
-        } else {
-            System.out.println("there is not available seats");
         }
     }
 
@@ -91,12 +85,10 @@ public class Restaurant {
 
     public synchronized void isCleaning() {
         if (isCleaning) {
-            System.out.println("\t\tCleaning");
-            if ((startedCleaning + maxCleaningTime) == time) {
+            if ((startedCleaning + MAX_CLEANING_TIME) == time) {
                 isCleaning = false;
 
                 setWaitingUntil();
-                // this.cleaningLock.release();
                 resetSeats();
 
                 isOpen = true;
@@ -112,7 +104,7 @@ public class Restaurant {
     // sets the waiting until all 5 customers leave their seats.
     public synchronized void setWaitingUntil() {
         try {
-            waitUntil = 5;
+            waitingCount = MAX_SEATS;
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -121,7 +113,7 @@ public class Restaurant {
     // one customer has left his seat.
     public synchronized void decrementWaitingUntil() {
         try {
-            waitUntil--;
+            waitingCount--;
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -131,7 +123,7 @@ public class Restaurant {
     public synchronized int getWaitingUntil() {
         int temp = 0;
         try {
-            temp = waitUntil;
+            temp = waitingCount;
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -180,9 +172,7 @@ public class Restaurant {
     }
 
     public void leaveRestaurant(String id) {
-        System.out.println("\t\t\tWaiting for customers to leave: " + getWaitingUntil());
         if (getWaitingUntil() == 0) {
-            System.out.println("\t\tAll customers have left: ");
             cleanRestaurant();
         }
     }

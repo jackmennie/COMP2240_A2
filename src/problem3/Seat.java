@@ -1,11 +1,9 @@
 package src.problem3;
 
 public class Seat {
-    private Restaurant restaurant;
     private boolean isTaken;
 
-    Seat(Restaurant restaurant) {
-        this.restaurant = restaurant;
+    Seat() {
         isTaken = false;
     }
 

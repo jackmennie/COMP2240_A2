@@ -32,13 +32,11 @@ public class Problem3 {
                 restaurant.isCleaning();
 
                 int time = restaurant.getTime();
-                System.out.println("!F!E TIME: " + time);
 
                 for (Customer customer : customers) {
                     if (customer.getArrivalTime() <= time && !customer.getStarted()) {
 
                         if (restaurant.isOpen()) {
-                            System.out.println("\tStarting thread for: " + customer.getId());
                             new Thread(customer).start();
 
                         }
@@ -66,12 +64,10 @@ public class Problem3 {
                 restaurant.isCleaning();
 
                 int time = restaurant.getTime();
-                System.out.println("F!E TIME: " + time);
 
                 for (Customer customer : customers) {
                     if (customer.getArrivalTime() <= time && !customer.getStarted()) {
                         if (restaurant.isOpen()) {
-                            System.out.println("\tStarting thread for: " + customer.getId());
                             new Thread(customer).start();
 
                         }
@@ -80,9 +76,7 @@ public class Problem3 {
 
                 if (restaurant.getWaitingUntil() <= 0) {
                     full = false;
-                    // resta?urant.getAccess().release(5);
                     break;
-
                 }
 
                 restaurant.incrementTime();
