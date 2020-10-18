@@ -97,7 +97,6 @@ public class Problem3 {
     private boolean checkCustomerAndPermitToEnter() {
         if (restaurant.getTotalFinished() >= bookedSeats) {
             hasProcessedAllBooked = true;
-            System.out.println("Should be complete");
             return true;
         }
 
@@ -112,9 +111,17 @@ public class Problem3 {
             if (customer.getArrivalTime() <= time && !customer.getStarted()) {
                 if (restaurant.isOpen()) {
                     new Thread(customer).start();
-
                 }
             }
+
+            // Without this, synchronisation goes out of whack
+            // This just lets the threads do their thing
+            try {
+                Thread.sleep(10);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
         }
 
         return false;

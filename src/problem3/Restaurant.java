@@ -192,9 +192,10 @@ public class Restaurant {
     /**
      * Increments the time by 1
      */
-    public void incrementTime() {
+    public synchronized void incrementTime() {
         try {
-            Thread.sleep(100);
+
+            Thread.sleep(10);
         } catch (InterruptedException ie) {
             // Do nothing with the exception
         }
@@ -209,7 +210,7 @@ public class Restaurant {
     /**
      * @return the current time
      */
-    synchronized public int getTime() {
+    public synchronized int getTime() {
         int temp = 0;
         try {
             temp = time;
@@ -223,14 +224,14 @@ public class Restaurant {
     /**
      * Add a customer to the total finished count
      */
-    public void incrementTotalFinished() {
+    public synchronized void incrementTotalFinished() {
         totalFinished++;
     }
 
     /**
      * @return the amount of finished customers
      */
-    public int getTotalFinished() {
+    public synchronized int getTotalFinished() {
         return totalFinished;
     }
 
@@ -241,7 +242,7 @@ public class Restaurant {
      * @param bookedSeats
      * @return true if more customers are required to be processed
      */
-    public boolean getCompleted(int bookedSeats) {
+    public synchronized boolean getCompleted(int bookedSeats) {
         return totalFinished < bookedSeats;
     }
 
