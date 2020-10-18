@@ -11,8 +11,9 @@ public class Restaurant {
     private int totalFinished;
     private boolean isOpen;
     private boolean isCleaning = false;
-    private int startedCleaning;
+    private int startedCleaningAtTime;
 
+    // Wow no more semaphores
     private ArrayList<Seat> seats;
 
     public Restaurant() {
@@ -85,7 +86,7 @@ public class Restaurant {
 
     public synchronized void isCleaning() {
         if (isCleaning) {
-            if ((startedCleaning + MAX_CLEANING_TIME) == time) {
+            if ((startedCleaningAtTime + MAX_CLEANING_TIME) == time) {
                 isCleaning = false;
 
                 setWaitingUntil();
@@ -98,7 +99,7 @@ public class Restaurant {
 
     public void cleanRestaurant() {
         isCleaning = true;
-        startedCleaning = time;
+        startedCleaningAtTime = time;
     }
 
     // sets the waiting until all 5 customers leave their seats.

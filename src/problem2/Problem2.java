@@ -1,5 +1,10 @@
 package src.problem2;
-//REMOVE SYNC FROM P2
+
+/**
+ * Problem 2: The Covid-Safe Restaurant
+ * Jack Mennie
+ * C3238004
+ */
 
 import java.util.ArrayList;
 
@@ -7,44 +12,46 @@ public class Problem2 {
     private ArrayList<Customer> customers = new ArrayList<>();
     private Restaurant restaurant;
 
-    private boolean full = false, empty = false;
+    private boolean fullRestaurant = false;
+    private boolean hasProcessedAllBooked = false;
+    private int bookedSeats;
 
+    /**
+     * Initialises the problem by passing in an array of customers Assumes the order
+     * is correct
+     * 
+     * @param customers
+     */
     public void init(ArrayList<Customer> customers) {
         restaurant = new Restaurant();
 
         // Customers need reference of the restaurant they are at
         for (Customer customer : customers) {
-            customer.arriveAtRestaurant(restaurant);
+            customer.bookedAtRestaurant(restaurant);
         }
 
         this.customers = customers;
+        bookedSeats = customers.size();
     }
 
+    /**
+     * The outer logic of problem 2
+     * 
+     * Runs customer threads when they should be ran
+     */
     public void run() {
-        int bookedSeats = customers.size();
 
-        while (restaurant.getCompleted(bookedSeats)) {
-            while (!full && !empty) {
-                if (restaurant.getTotalFinished() >= bookedSeats) {
-                    empty = true;
+        // While there is customers to be completed as per the booked night
+        while (restaurant.isPendingCustomers(bookedSeats)) {
+
+            // While there is atleast one customer, then perform restaurant logic
+            while (!fullRestaurant && !hasProcessedAllBooked) {
+                if (checkCustomerAndPermitToEnter()) {
                     break;
                 }
 
-                restaurant.isCleaning();
-
-                int time = restaurant.getTime();
-
-                for (Customer customer : customers) {
-                    if (customer.getArrivalTime() <= time && !customer.getStarted()) {
-                        if (restaurant.isOpen()) {
-                            new Thread(customer).start();
-
-                        }
-                    }
-                }
-
                 if (restaurant.getAccess().availablePermits() == 0) {
-                    full = true;
+                    fullRestaurant = true;
                     break;
                 }
 
@@ -52,32 +59,18 @@ public class Problem2 {
 
             }
 
-            // sets the waiting until 5 process's are done.
+            // Restaurant is full, so we can set the waiting count
             restaurant.setWaitingUntil();
 
-            while (full && !empty) {
-                if (restaurant.getTotalFinished() >= bookedSeats) {
-                    empty = true;
+            // While full, the threads are still processing and can become complete,
+            // and we still have customers to process, so lets keep checking them
+            while (fullRestaurant && !hasProcessedAllBooked) {
+                if (checkCustomerAndPermitToEnter()) {
                     break;
                 }
 
-                restaurant.isCleaning();
-
-                int time = restaurant.getTime();
-
-                for (Customer customer : customers) {
-                    if (customer.getArrivalTime() <= time && !customer.getStarted()) {
-                        if (restaurant.isOpen()) {
-
-                            new Thread(customer).start();
-
-                        }
-                    }
-                }
-
                 if (restaurant.getWaitingUntil() <= 0) {
-                    full = false;
-                    // resta?urant.getAccess().release(5);
+                    fullRestaurant = false;
                     break;
 
                 }
@@ -96,5 +89,38 @@ public class Problem2 {
             customers.get(j).getLog();
         }
 
+    }
+
+    /**
+     * We need this function to break the loop Hence why it returns a boolean
+     * 
+     * If we have finished processing all customers that have booked, then we set
+     * hasProcessedAllBooked to true which then will break out from the inner loop.
+     * 
+     * @return if we can break
+     */
+    private boolean checkCustomerAndPermitToEnter() {
+        if (restaurant.getTotalFinished() >= bookedSeats) {
+            hasProcessedAllBooked = true;
+            return true;
+        }
+
+        restaurant.cleanRestaurantIfRequired();
+
+        int time = restaurant.getTime();
+
+        // Go through each customer that is booked, check if they have arrived, and
+        // start that thread
+        // only if the restaurant can allow them to come in.
+        for (Customer customer : customers) {
+            if (customer.getArrivalTime() <= time && !customer.getStarted()) {
+                if (restaurant.isOpen()) {
+                    new Thread(customer).start();
+
+                }
+            }
+        }
+
+        return false;
     }
 }
