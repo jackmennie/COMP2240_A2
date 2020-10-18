@@ -28,7 +28,8 @@
       "type": "java",
       "name": "Debug (Launch)-P3",
       "request": "launch",
-      "mainClass": "src.P3"
+      "mainClass": "src.P3",
+      "args": "src/problem3/P3-2in.txt"
     }
   ]
 }
