@@ -1,5 +1,14 @@
 package src;
 
+/**
+ * Jack Mennie
+ * C3238004
+ * 
+ * Input class for problem 3
+ * Entry point, read file, init problem
+ * Run 
+ */
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
@@ -27,7 +36,10 @@ public class P3 {
 
             ArrayList<Customer> customers = new ArrayList<>();
 
+            // Loop through that input and grab that information to run the program
             while (scanner.hasNext()) {
+                // Input has two ints, arrival and eating time, enter arrival first as
+                // it appears first, then toggle off to get eating time
                 if (scanner.hasNextInt() && isArrival) {
                     arrivalTime = scanner.nextInt();
                     isArrival = false;
@@ -38,6 +50,8 @@ public class P3 {
                     Customer customer = new Customer(id, arrivalTime, eatingTime);
                     customers.add(customer);
                 } else {
+                    // Middle input is the id, so check if the next value is anything other
+                    // then the empty string
                     String value = scanner.next();
                     if (value != " ") {
                         id = value;
